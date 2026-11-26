@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 
@@ -14,12 +15,12 @@ import {
 import { styles } from "./styles";
 
 // Importando as cores
-import { colors } from "./colors";
+import colors from "./colors";
 
 export default function App() {
   const [nome, setNome] = useState("");
   const [contador, setContador] = useState(0);
-  const [temaEscuro, setTemaEscuro] = useState(false);
+  const [temaAtual, setTemaAtual] = useState("light");
 
   // META DIÁRIA DO APLICATIVO
   const meta = 10;
@@ -31,14 +32,38 @@ export default function App() {
   const { width } = useWindowDimensions();
   const telaPequena = width < 380;
 
-  // Seleção do tema
-  const tema = temaEscuro ? colors.dark : colors.light;
+  // Seleção do tema atual
+  const tema = colors[temaAtual];
+
+  // Alternar entre os três temas
+  const mudarTema = () => {
+    setTemaAtual((atual) => {
+      if (atual === "light") return "dark";
+      if (atual === "dark") return "bloody";
+      return "light";
+    });
+  };
 
   return (
-    <View style={[styles.container, { backgroundColor: tema.background }]}>
-      <StatusBar style={temaEscuro ? "light" : "dark"} />
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: tema.background },
+      ]}
+    >
+      <StatusBar
+        style={temaAtual === "light" ? "dark" : "light"}
+      />
 
-      <ScrollView contentContainerStyle={styles.conteudo}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.conteudo,
+          {
+            paddingHorizontal: telaPequena ? 12 : 20,
+            paddingTop: telaPequena ? 20 : 40,
+          },
+        ]}
+      >
         <View
           style={[
             styles.cartao,
@@ -49,11 +74,24 @@ export default function App() {
           ]}
         >
           {/* TÍTULO */}
-          <Text style={[styles.titulo, { fontSize: telaPequena ? 20 : 24 }]}>
+          <Text
+            style={[
+              styles.titulo,
+              {
+                fontSize: telaPequena ? 20 : 24,
+                color: tema.primary,
+              },
+            ]}
+          >
             Meu Contador de Metas
           </Text>
 
-          <Text style={[styles.subtitulo, { color: tema.subtitle }]}>
+          <Text
+            style={[
+              styles.subtitulo,
+              { color: tema.subtitle },
+            ]}
+          >
             Programação Mobile I
           </Text>
 
@@ -74,13 +112,20 @@ export default function App() {
           />
 
           {/* BOAS-VINDAS */}
-          <Text style={[styles.boasVindas, { color: tema.text }]}>
+          <Text
+            style={[
+              styles.boasVindas,
+              { color: tema.text },
+            ]}
+          >
             {nome.trim() ? `Olá, ${nome}!` : "Olá, estudante!"}
           </Text>
 
           {/* PROGRESSO DA META */}
           <View style={styles.linhaMeta}>
-            <Text style={{ color: tema.text }}>Progresso da meta</Text>
+            <Text style={{ color: tema.text }}>
+              Progresso da meta
+            </Text>
 
             <Text style={{ color: tema.text }}>
               {contador} / {meta}
@@ -89,71 +134,149 @@ export default function App() {
 
           {/* BARRA DE PROGRESSO */}
           <View
-            style={[styles.barraFundo, { backgroundColor: tema.progressTrack }]}
+            style={[
+              styles.barraFundo,
+              { backgroundColor: tema.progressTrack },
+            ]}
           >
-            <View style={[styles.barraProgresso, { width: `${progresso}%` }]} />
+            <View
+              style={[
+                styles.barraProgresso,
+                {
+                  width: `${progresso}%`,
+                  backgroundColor: tema.progress,
+                },
+              ]}
+            />
           </View>
 
-          <Text style={[styles.textoProgresso, { color: tema.subtitle }]}>
+          <Text
+            style={[
+              styles.textoProgresso,
+              { color: tema.subtitle },
+            ]}
+          >
             {Math.round(progresso)}% concluído
           </Text>
 
           {/* MENSAGEM DE META */}
           {contador >= meta ? (
-            <Text style={styles.mensagem}>
+            <Text
+              style={[
+                styles.mensagem,
+                { color: tema.success },
+              ]}
+            >
               Parabéns! Você chegou a 10 ou mais!
             </Text>
           ) : (
-            <Text style={[styles.dica, { color: tema.subtitle }]}>
+            <Text
+              style={[
+                styles.dica,
+                { color: tema.subtitle },
+              ]}
+            >
               Continue testando os botões.
             </Text>
           )}
 
           {/* BOTÕES DE CONTROLE */}
-          <View style={styles.linhaBotoes}>
+          <View
+            style={[
+              styles.linhaBotoes,
+              telaPequena && styles.linhaBotoesPequena,
+            ]}
+          >
             <Pressable
               disabled={contador === 0}
               style={[
                 styles.botao,
                 styles.botaoMenos,
+                {
+                  backgroundColor: tema.primary,
+                  marginRight: telaPequena ? 0 : 6,
+                  marginBottom: telaPequena ? 10 : 0,
+                },
                 contador === 0 && styles.botaoDesabilitado,
               ]}
-              onPress={() => setContador((valor) => Math.max(0, valor - 1))}
+              onPress={() =>
+                setContador((valor) => Math.max(0, valor - 1))
+              }
             >
-              <Text style={styles.textoBotao}>− Diminuir</Text>
+              <Text style={styles.textoBotao}>
+                − Diminuir
+              </Text>
             </Pressable>
 
             <Pressable
-              style={[styles.botao, styles.botaoMais]}
-              onPress={() => setContador((valor) => valor + 1)}
+              style={[
+                styles.botao,
+                styles.botaoMais,
+                {
+                  backgroundColor: tema.success,
+                  marginLeft: telaPequena ? 0 : 6,
+                },
+              ]}
+              onPress={() =>
+                setContador((valor) => valor + 1)
+              }
             >
-              <Text style={styles.textoBotao}>+ Adicionar</Text>
+              <Text style={styles.textoBotao}>
+                + Adicionar
+              </Text>
             </Pressable>
           </View>
 
           {/* BOTÕES EXTRAS */}
-          <View style={styles.linhaBotoes}>
+          <View
+            style={[
+              styles.linhaBotoes,
+              telaPequena && styles.linhaBotoesPequena,
+            ]}
+          >
             <Pressable
-              style={[styles.botao, styles.botaoZerar]}
+              style={[
+                styles.botao,
+                styles.botaoZerar,
+                {
+                  backgroundColor: tema.secondary,
+                  marginRight: telaPequena ? 0 : 6,
+                  marginBottom: telaPequena ? 10 : 0,
+                },
+              ]}
               onPress={() => setContador(0)}
             >
-              <Text style={styles.textoBotao}>Zerar</Text>
+              <Text style={styles.textoBotao}>
+                Zerar
+              </Text>
             </Pressable>
 
             <Pressable
-              style={[styles.botao, styles.botaoTema]}
-              onPress={() => setTemaEscuro((valor) => !valor)}
+              style={[
+                styles.botao,
+                styles.botaoTema,
+                {
+                  backgroundColor: tema.purple,
+                  marginLeft: telaPequena ? 0 : 6,
+                },
+              ]}
+              onPress={mudarTema}
             >
               <Text style={styles.textoBotao}>
-                {temaEscuro ? "Tema claro" : "Tema escuro"}
+                Mudar tema
               </Text>
             </Pressable>
           </View>
         </View>
 
         {/* RODAPÉ */}
-        <Text style={[styles.rodape, { color: tema.subtitle }]}>
-          Desenvolvido por Andre Hifran
+        <Text
+          style={[
+            styles.rodape,
+            { color: tema.subtitle },
+          ]}
+        >
+          Desenvolvido por Icaro Abraão
         </Text>
       </ScrollView>
     </View>
